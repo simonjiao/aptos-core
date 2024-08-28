@@ -596,6 +596,39 @@ pub enum StatusCode {
     RESERVED_VALIDATION_ERROR_8 = 43,
     RESERVED_VALIDATION_ERROR_9 = 44,
 
+    // The code is not running in genesis
+    NOT_GENESIS = 500,
+    // Config value doesn't exist
+    CONFIG_VALUE_DOES_NOT_EXIST = 501,
+    // Timestamp is invalid
+    INVALID_TIMESTAMP = 502,
+    // Coin to deposit is zero
+    COIN_DEPOSIT_IS_ZERO = 503,
+    // Token to destroy is not zero
+    DESTROY_TOKEN_NON_ZERO = 504,
+    // Block number mismatch
+    BLOCK_NUMBER_MISMATCH = 505,
+    // Signer delegated
+    SIGNER_ALREADY_DELEGATED = 506,
+    // Upgrade plan is none
+    UPGRADE_PLAN_IS_NONE = 507,
+    // Package hash incorrect
+    PACKAGE_HASH_INCORRECT = 508,
+    // Active time incorrect
+    ACTIVE_TIME_INCORRECT = 509,
+    // Strategy freezed
+    STRATEGY_FREEZED = 510,
+    // Strategy incorrect
+    STRATEGY_INCORRECT = 511,
+    // Strategy not two phase
+    STRATEGY_NOT_TWO_PHASE = 512,
+    // Unkown strategy
+    UNKNOWN_STRATEGY = 513,
+    // Send and package address mismatch
+    SENDER_AND_PACKAGE_ADDRESS_MISMATCH = 514,
+    // Send txn global frozen
+    SEND_TXN_GLOBAL_FROZEN = 515,
+
     // When a code module/script is published it is verified. These are the
     // possible errors that can arise from the verification process.
     // Verification Errors: 1000-1999

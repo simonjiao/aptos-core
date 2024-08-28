@@ -30,6 +30,7 @@ serde = { workspace = true }
 serde_bytes = { workspace = true }
 thiserror = { workspace = true }
 uint = { workspace = true }
+openrpc-schema = {git = "https://github.com/starcoinorg/openrpc-rs",rev = "f8ab047e30927cdf2f605b61a219c975d6c4f666"}
 
 [dev-dependencies]
 arbitrary = { workspace = true, features = ["derive_arbitrary"] }
@@ -40,4 +41,5 @@ serde_json = { workspace = true }
 
 [features]
 default = []
+address16 = []
 fuzzing = ["proptest", "proptest-derive", "arbitrary"]

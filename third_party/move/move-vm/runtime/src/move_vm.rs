@@ -18,6 +18,7 @@ use move_core_types::{
 };
 use move_vm_types::resolver::MoveResolver;
 use std::sync::Arc;
+use move_binary_format::errors::PartialVMResult;
 
 #[derive(Clone)]
 pub struct MoveVM {
@@ -191,5 +192,12 @@ impl MoveVM {
             .fetch_module(module)?
             .module()
             .metadata)
+    }
+
+    pub fn update_native_functions(
+        &mut self,
+        natives: impl IntoIterator<Item = (AccountAddress, Identifier, Identifier, NativeFunction)>,
+    ) -> PartialVMResult<()> {
+        self.runtime.loader_mut().update_native_functions(natives)
     }
 }

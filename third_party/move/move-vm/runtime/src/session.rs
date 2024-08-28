@@ -11,7 +11,7 @@ use crate::{
     native_extensions::NativeContextExtensions,
 };
 use bytes::Bytes;
-use move_binary_format::{compatibility::Compatibility, errors::*, file_format::LocalIndex};
+use move_binary_format::{compatibility::Compatibility, errors::*, file_format::LocalIndex, CompiledModule};
 use move_core_types::{
     account_address::AccountAddress,
     effects::{ChangeSet, Changes},
@@ -27,6 +27,7 @@ use move_vm_types::{
     values::{GlobalValue, Value},
 };
 use std::{borrow::Borrow, sync::Arc};
+use move_vm_types::values::Locals;
 
 pub struct Session<'r, 'l> {
     pub(crate) move_vm: &'l MoveVM,
@@ -251,6 +252,33 @@ impl<'r, 'l> Session<'r, 'l> {
             gas_meter,
             Compatibility::no_check(),
         )
+    }
+
+    pub fn publish_module_to_data_cache(&mut self, module_id: &ModuleId, blob: Vec<u8>, republish: bool) -> VMResult<()> {
+        self.data_cache.publish_module(
+            module_id,
+            blob,
+            republish
+        )
+    }
+
+    pub fn verify_module_bundle_for_publication(
+        &mut self,
+        modules: &[CompiledModule],
+    ) -> VMResult<()> {
+        self.move_vm.runtime.loader().verify_module_bundle_for_publication(
+            modules,
+            &mut self.data_cache,
+            &self.module_store,
+        )
+    }
+
+    pub fn deserialize_args(
+        &self,
+        param_tys: Vec<Type>,
+        serialized_args: Vec<impl Borrow<[u8]>>,
+    ) -> PartialVMResult<(Locals, Vec<Value>)> {
+        self.move_vm.runtime.deserialize_args(&self.module_store, param_tys, serialized_args)
     }
 
     pub fn num_mutated_accounts(&self, sender: &AccountAddress) -> u64 {

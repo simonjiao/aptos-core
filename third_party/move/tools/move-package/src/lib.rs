@@ -23,10 +23,7 @@ use move_compiler::{
     command_line::SKIP_ATTRIBUTE_CHECKS, shared::known_attributes::KnownAttribute,
 };
 use move_core_types::account_address::AccountAddress;
-use move_model::{
-    metadata::{CompilerVersion, LanguageVersion},
-    model,
-};
+use move_model::{metadata::{CompilerVersion, LanguageVersion}, model};
 use serde::{Deserialize, Serialize};
 use source_package::{layout::SourcePackageLayout, std_lib::StdVersion};
 use std::{
@@ -35,6 +32,7 @@ use std::{
     io::Write,
     path::{Path, PathBuf},
 };
+use crate::source_package::parsed_manifest::PackageInfo;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum Architecture {
@@ -208,6 +206,17 @@ impl BuildConfig {
         let ret = BuildPlan::create(resolved_graph)?.compile(&config, writer);
         mutx.unlock();
         ret
+    }
+
+    // Same as compile_package but returns the compiled package and package info
+    pub fn compile_package_with_pkg_info<W: Write>(self, path: &Path, writer: &mut W) -> Result<(CompiledPackage, PackageInfo)> {
+        let config = self.compiler_config.clone(); // Need clone because of mut self
+        let resolved_graph = self.resolution_graph_for_package(path, writer)?;
+        let pkg_info = resolved_graph.root_package.package.clone();
+        let mutx = PackageLock::lock();
+        let ret = BuildPlan::create(resolved_graph)?.compile(&config, writer);
+        mutx.unlock();
+        ret.map(|p|(p, pkg_info))
     }
 
     /// Compile the package at `path` or the containing Move package. Do not exit process on warning

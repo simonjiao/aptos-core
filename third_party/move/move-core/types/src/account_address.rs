@@ -7,6 +7,7 @@ use num::BigUint;
 use rand::{rngs::OsRng, Rng};
 use serde::{de::Error as _, Deserialize, Deserializer, Serialize, Serializer};
 use std::{convert::TryFrom, fmt, str::FromStr};
+use openrpc_schema::schemars::{gen::SchemaGenerator, JsonSchema, schema::{InstanceType, Schema, SchemaObject}};
 
 /// A struct that represents an account address.
 #[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Clone, Copy)]
@@ -14,12 +15,33 @@ use std::{convert::TryFrom, fmt, str::FromStr};
 #[cfg_attr(any(test, feature = "fuzzing"), derive(arbitrary::Arbitrary))]
 pub struct AccountAddress([u8; AccountAddress::LENGTH]);
 
+impl JsonSchema for AccountAddress {
+    fn schema_name() -> String {
+        "AccountAddress".to_owned()
+    }
+
+    fn json_schema(_: &mut SchemaGenerator) -> Schema {
+        SchemaObject {
+            instance_type: Some(InstanceType::String.into()),
+            format: Some("AccountAddress".to_owned()),
+            ..Default::default()
+        }
+            .into()
+    }
+}
+
 impl AccountAddress {
     /// Hex address: 0x4
     pub const FOUR: Self = Self::get_hex_address_four();
     /// The number of bytes in an address.
-    /// Default to 16 bytes, can be set to 20 bytes with address20 feature.
-    pub const LENGTH: usize = 32;
+    /// Default to 32 bytes, can be set to 20 bytes with address20 feature.
+    pub const LENGTH: usize = if cfg!(feature = "address20") {
+        20
+    } else if cfg!(feature = "address16") {
+        16
+    } else {
+        32
+    };
     /// Max address: 0xff....
     pub const MAX_ADDRESS: Self = Self([0xFF; Self::LENGTH]);
     /// Hex address: 0x1

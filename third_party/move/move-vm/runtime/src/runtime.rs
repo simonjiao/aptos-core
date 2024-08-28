@@ -256,7 +256,7 @@ impl VMRuntime {
         }
     }
 
-    fn deserialize_args(
+    pub(crate) fn deserialize_args(
         &self,
         module_store: &ModuleStorageAdapter,
         param_tys: Vec<Type>,
@@ -486,6 +486,10 @@ impl VMRuntime {
 
     pub(crate) fn loader(&self) -> &Loader {
         &self.loader
+    }
+
+    pub(crate) fn loader_mut(&mut self) -> &mut Loader {
+        &mut self.loader
     }
 
     pub(crate) fn module_storage(&self) -> Arc<dyn ModuleStorage> {

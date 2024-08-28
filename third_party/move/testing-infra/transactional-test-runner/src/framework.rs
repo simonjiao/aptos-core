@@ -752,7 +752,7 @@ impl<'a> CompiledState<'a> {
         self.modules.insert(id, processed);
     }
 
-    fn add_precompiled(&mut self, named_addr_opt: Option<Symbol>, module: CompiledModule) {
+    pub fn add_precompiled(&mut self, named_addr_opt: Option<Symbol>, module: CompiledModule) {
         let id = module.self_id();
         if let Some(named_addr) = named_addr_opt {
             self.compiled_module_named_address_mapping
@@ -779,6 +779,12 @@ impl<'a> CompiledState<'a> {
             id
         );
     }
+
+    pub fn compile(&mut self, path: &str) -> Result<(AnnotatedCompiledUnit, Option<String>)> {
+        compile_source_unit(self.pre_compiled_deps_v1, self.named_address_mapping.clone(), &[], path.to_string(), &BTreeSet::new(), false)
+            .map(|(unit, _model, warnings)| (unit, warnings))
+    }
+
 }
 
 fn compile_source_unit_v2(
